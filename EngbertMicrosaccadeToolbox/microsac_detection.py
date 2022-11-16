@@ -26,3 +26,44 @@ def pix2deg(pix, moWidthPX, moWidthCM, distanceCM):
     degPerPx = degPerCm / pxPerCm
     deg = degPerPx * pix
     return deg
+
+
+def vecvel():
+    raise Exception("Not Implemented")
+
+
+def microsacc():
+    raise Exception("Not Implemented")
+
+
+def aaft():
+    raise Exception("Not Implemented")
+
+def binsacc():
+    raise Exception("Not Implemented")
+
+def boxcount():
+    raise Exception("Not Implemented")
+
+def ffth():
+    raise Exception("Not Implemented")
+
+def ftpr():
+    raise Exception("Not Implemented")
+
+def ifftsh():
+    raise Exception("Not Implemented")
+
+def lagdist():
+    raise Exception("Not Implemented")
+
+
+
+def sacpar():
+    raise Exception("Not Implemented")
+
+def smoothdata():
+    raise Exception("Not Implemented")
+
+def surrogate():
+    raise Exception("Not Implemented")
