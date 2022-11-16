@@ -28,19 +28,58 @@ def pix2deg(pix, moWidthPX, moWidthCM, distanceCM):
     return deg
 
 
-def vecvel():
-    raise Exception("Not Implemented")
+def vecvel(x, sampling):
+    """Compute velocity times series from position data
+
+    Parameters
+    ----------
+    x : np.array
+        of shape (N, 2)
+    sampling : int
+        sampling rate
+
+    Returns
+    -------
+    np.array
+        of velocities
+    """
+    N, _ = x.shape
+    v = np.zeros((N, 2))
+    print(v.shape)
+    v[2:(N - 2), ] = sampling / 6 * (x[4:N, ] + x[3:(N - 1), ]
+                                     - x[1:(N - 3), ] - x[0:(N - 4), ])
+    v[1, ] = sampling / 2 * (x[2, ] - x[0, ])
+    v[(N - 2), ] = sampling / 2 * (x[N - 1, ] - x[(N - 3), ])
+    return v
+
+
+def smoothdata(x):
+    x0 = x[0, ]
+    v = vecvel(x, sampling=1)
+    v[0, ] = v[0, ] + x0
+    v = v.cumsum(axis=0)
+    return v
+
+    
+    
+    
+
+
 
 
 def microsacc():
     raise Exception("Not Implemented")
 
 
-def aaft():
-    raise Exception("Not Implemented")
 
 def binsacc():
     raise Exception("Not Implemented")
+
+
+
+def aaft():
+    raise Exception("Not Implemented")
+
 
 def boxcount():
     raise Exception("Not Implemented")
@@ -60,9 +99,6 @@ def lagdist():
 
 
 def sacpar():
-    raise Exception("Not Implemented")
-
-def smoothdata():
     raise Exception("Not Implemented")
 
 def surrogate():
