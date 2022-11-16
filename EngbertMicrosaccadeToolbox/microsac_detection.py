@@ -64,7 +64,7 @@ def _test_crit(v, VFAC):
     # Compute threshold
     med = np.median(v, axis=0)
     # median square displacement
-    msd = np.sqrt(np.median((v-med)**2, axis=0))
+    msd = np.sqrt(np.median((v - med)**2, axis=0))
     # TODO Warning when too small
 
     radius = VFAC * msd
@@ -74,6 +74,21 @@ def _test_crit(v, VFAC):
 
 
 def _identify_saccade_candidates(indx, mindur):
+    """takes an all identified indexes and finds atart and endpoints for
+    saccades
+
+    Parameters
+    ----------
+    indx : np.array
+        array of indexes where velocity criterion is met
+    mindur : int
+        minimum duration of an event
+
+    Returns
+    -------
+    list
+        list of events with [[start, end], ...]
+    """
     # Determine saccades
     N = len(indx)
     nsac = 0
@@ -106,6 +121,27 @@ def _identify_saccade_candidates(indx, mindur):
 
 
 def microsacc(x, vfac=5, mindur=3, sampling=500):
+    """finds microsaccades
+
+    Parameters
+    ----------
+    x : np.array
+        of shape [N,2] representing positions
+    vfac : int
+        relative velocity threshold
+    mindur : int, optional
+        minimal saccade duration
+    sampling : int
+        sampling rate
+
+
+    Returns
+    -------
+    list
+        list of events with [(1) onset, (2) end, (3) peak velocity,
+                             (4) horizontal component, (5) vertical component,
+                             (6) horizontal amplitude, (6) vertical amplitude]
+    """
     sac_list = []
     # Compute velocity
     v = vecvel(x, sampling=sampling)
@@ -148,9 +184,6 @@ def microsacc(x, vfac=5, mindur=3, sampling=500):
             sac_list.append(sac_prop)
             # in theory also the radius
     return(sac_list)
-
-
-
 
 
 def binsacc():
