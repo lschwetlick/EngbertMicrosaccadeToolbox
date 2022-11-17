@@ -45,7 +45,6 @@ def test_microsac():
     sac = microsac_detection.microsacc(input_array)
     expected = np.genfromtxt("tests/xrs_sac.dat")
     res = np.array(sac)
-    #offbyone
-    res[:, 0:2] = res[:, 0:2] + 1
-    print(res)
-    assert np.allclose(expected[:, 0:5], res)
+    # offbyone
+    res[:, 0:2] = res[:, 0:2] + 1   
+    np.testing.assert_allclose(expected[:, 0:7], res)

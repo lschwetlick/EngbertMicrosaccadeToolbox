@@ -169,18 +169,23 @@ def microsacc(x, vfac=5, mindur=3, sampling=500):
             dy = x[end, 1] - x[start, 1]
 
             # Saccade amplitude (dX,dY)
-            # minx <- min(x[idx,1])
-            # maxx <- max(x[idx,1])
-            # miny <- min(x[idx,2])
-            # maxy <- max(x[idx,2])
-            # ix1 <- which.min(x[idx,1])
-            # ix2 <- which.max(x[idx,1])
-            # iy1 <- which.min(x[idx,2])
-            # iy2 <- which.max(x[idx,2])
-            # dX <- sign(ix2-ix1)*(maxx-minx)
-            # dY = sign(iy2-iy1)*(maxy-miny)
-            # sac[s,6:7] = c(dX,dY)
-            sac_prop = [start, end, vpeak, dx, dy]
+            #print(np.min(x[start:end, 0]))
+            #print(x[start:end, 0])
+
+            minx = np.min(x[start:end + 1, 0])
+            maxx = np.max(x[start:end + 1, 0])
+            miny = np.min(x[start:end + 1, 1])
+            maxy = np.max(x[start:end + 1, 1])
+
+            ix1 = np.argmin(x[start:end + 1, 0])
+            ix2 = np.argmax(x[start:end + 1, 0])
+            iy1 = np.argmin(x[start:end + 1, 1])
+            iy2 = np.argmax(x[start:end + 1, 1])
+
+            x_amp = np.sign(ix2 - ix1) * (maxx - minx)
+            y_amp = np.sign(iy2 - iy1) * (maxy - miny)
+            #print(minx, maxx, miny, maxy, ix1, ix2, iy1, iy2, x_amp, y_amp)
+            sac_prop = [start, end, vpeak, dx, dy, x_amp, y_amp]
             sac_list.append(sac_prop)
             # in theory also the radius
     return(sac_list)
@@ -189,11 +194,8 @@ def microsacc(x, vfac=5, mindur=3, sampling=500):
 def binsacc():
     raise Exception("Not Implemented")
 
-
-
 def aaft():
     raise Exception("Not Implemented")
-
 
 def boxcount():
     raise Exception("Not Implemented")
@@ -209,8 +211,6 @@ def ifftsh():
 
 def lagdist():
     raise Exception("Not Implemented")
-
-
 
 def sacpar():
     raise Exception("Not Implemented")
