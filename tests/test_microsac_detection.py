@@ -18,3 +18,11 @@ def test_vecvel():
     expected = np.array([[0, 500, 500, 500, 0], [0, 500, 500, 500, 0]]).T
     result = microsac_detection.vecvel(input_array, 500)
     assert np.allclose(expected, result)
+
+
+def test_mark_combined():
+    input_array_l = [[1,3], [6,9]]
+    input_array_r = [[2,4], [6,9]]
+    s = microsac_detection._mark_combined_sacs(input_array_r, input_array_l)
+    expected = np.array([0,1,1,1,1,0,1,1,1,1,0])
+    np.testing.assert_allclose(expected, s.astype(int))

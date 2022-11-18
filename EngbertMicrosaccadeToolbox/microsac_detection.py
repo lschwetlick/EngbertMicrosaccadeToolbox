@@ -153,11 +153,9 @@ def microsacc(x, vfac=5, mindur=3, sampling=500):
     sac = _identify_saccade_candidates(indx, mindur)
     nsac = len(sac)
 
-    print(nsac)
     if nsac > 0:
         # Compute peak velocity, horiztonal and vertical components
         for i, s in enumerate(sac):
-            print(i)
             # Onset and offset for saccades
             start = int(s[0])
             end = int(s[1])
@@ -169,8 +167,6 @@ def microsacc(x, vfac=5, mindur=3, sampling=500):
             dy = x[end, 1] - x[start, 1]
 
             # Saccade amplitude (dX,dY)
-            #print(np.min(x[start:end, 0]))
-            #print(x[start:end, 0])
 
             minx = np.min(x[start:end + 1, 0])
             maxx = np.max(x[start:end + 1, 0])
@@ -184,15 +180,89 @@ def microsacc(x, vfac=5, mindur=3, sampling=500):
 
             x_amp = np.sign(ix2 - ix1) * (maxx - minx)
             y_amp = np.sign(iy2 - iy1) * (maxy - miny)
-            #print(minx, maxx, miny, maxy, ix1, ix2, iy1, iy2, x_amp, y_amp)
             sac_prop = [start, end, vpeak, dx, dy, x_amp, y_amp]
             sac_list.append(sac_prop)
             # in theory also the radius
     return(sac_list)
 
 
-def binsacc():
-    raise Exception("Not Implemented")
+def _mark_combined_sacs(ixes_r, ixes_l):
+    # Determine saccade clusters
+    end_ixes_l = ixes_l[:, 1]  # [s[1] for s in sacl]
+    end_ixes_r = ixes_r[:, 1]  # [s[1] for s in sacr]
+    TR = np.max(end_ixes_r)
+    TL = np.max(end_ixes_l)
+    TB = int(np.max([TL, TR]))
+    sacs = np.zeros(TB + 2)
+
+    for sl in ixes_l:
+        sacs[int(sl[0]):(int(sl[1]) + 1)] = 1
+
+    for sr in ixes_r:
+        sacs[int(sr[0]): (int(sr[1]) + 1)] = 1
+    sacs[0] = 0
+    sacs[TB + 1] = 0
+    return sacs
+
+
+def binsacc(sacl, sacr):
+    ixes_l = np.array([np.array([s[0], s[1]]) for s in sacl])
+    ixes_r = np.array([np.array([s[0], s[1]]) for s in sacr])
+
+    NB = 0
+    NR = 0
+    NL = 0
+    if (len(sacr) != 0) and (len(sacl) != 0):
+        s = _mark_combined_sacs(ixes_l, ixes_r)
+        # Find onsets and offsets of microsaccades
+        onoff = np.where(np.diff(s) != 0)[0]
+        m = onoff.reshape((-1, 2))
+        N = m.shape[0]
+
+        # Determine binocular saccades
+        bino = []
+        monol = []
+        monor = []
+        for i in range(N):
+            left = np.where(np.logical_and((m[i, 0] <= ixes_l[:, 0]),
+                                           (ixes_l[:, 1] <= m[i, 1])))[0]
+            right = np.where(np.logical_and((m[i, 0] <= ixes_r[:, 0]),
+                                            (ixes_r[:, 1] <= m[i, 1])))[0]
+            # Binocular saccades
+            if len(left) > 0 and len(right) > 0:
+                ampl = 0
+                l_ix = 0
+                for il, l in enumerate(left):
+                    new_ampl = np.sqrt(sacl[l][5]**2 + sacl[l][6]**2)
+                    if new_ampl > ampl:
+                        ampl = new_ampl
+                        l_ix = il
+
+                ampr = 0
+                for ir, r in enumerate(right):
+                    new_ampr = np.sqrt(sacr[r][5]**2 + sacl[r][6]**2)
+                    if new_ampr > ampr:
+                        ampl = new_ampl
+                        r_ix = ir
+                NB += 1
+                combined = list(sacl[left[l_ix]])
+                combined.extend(list(sacr[right[r_ix]]))
+                bino.append(combined)
+            else:
+                if len(left) == 0:
+                    assert len(right) == 1
+                    ampr = np.sqrt(sacr[right[0]][5]**2 + sacr[right[0]][6]**2)
+                    NR += 1
+            #           ir <- which.max(ampr)
+                    monor.append(list(sacr[right[0]]))
+                if len(right) == 0:
+                    assert len(left) == 1
+                    ampl = np.sqrt(sacl[left[0]][5]**2 + sacl[left[0]][6]**2)
+                    NL += 1
+                    monol.append(list(sacl[left[0]]))
+    return bino, monol, monor
+
+
 
 def aaft():
     raise Exception("Not Implemented")

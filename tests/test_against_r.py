@@ -46,5 +46,31 @@ def test_microsac():
     expected = np.genfromtxt("tests/xrs_sac.dat")
     res = np.array(sac)
     # offbyone
-    res[:, 0:2] = res[:, 0:2] + 1   
+    res[:, 0:2] = res[:, 0:2] + 1
     np.testing.assert_allclose(expected[:, 0:7], res)
+
+
+def test_mark_combined():
+    input_array_l = np.genfromtxt("tests/sacl.dat")
+    input_array_r = np.genfromtxt("tests/sacr.dat")
+    input_array_l[:, 0:2] = input_array_l[:, 0:2] - 1
+    input_array_r[:, 0:2] = input_array_r[:, 0:2] - 1
+    s = microsac_detection._mark_combined_sacs(input_array_r, input_array_l)
+    expected = np.genfromtxt("tests/s.dat")
+    np.testing.assert_allclose(expected, s)
+
+
+def test_binsacc():
+    input_array_l = np.genfromtxt("tests/sacl.dat")
+    input_array_r = np.genfromtxt("tests/sacr.dat")
+    input_array_l[:, 0:2] = input_array_l[:, 0:2] - 1
+    input_array_r[:, 0:2] = input_array_r[:, 0:2] - 1
+    bino, monol, monor = microsac_detection.binsacc(input_array_l, input_array_r)
+    expected_bino = np.genfromtxt("tests/bino.dat")
+    expected_bino[:, 0:2] = expected_bino[:, 0:2] - 1
+    expected_bino[:, 7:9] = expected_bino[:, 7:9] - 1
+    expected_monol = np.genfromtxt("tests/monol.dat")
+    expected_monol[:, 0:2] = expected_monol[:, 0:2] - 1
+    np.testing.assert_allclose(expected_bino, np.array(bino))
+    np.testing.assert_allclose(expected_monol, np.array(monol))
+    assert monor == []
