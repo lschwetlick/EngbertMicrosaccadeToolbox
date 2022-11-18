@@ -239,10 +239,11 @@ def binsacc(sacl, sacr):
                         l_ix = il
 
                 ampr = 0
+                r_ix = 0
                 for ir, r in enumerate(right):
-                    new_ampr = np.sqrt(sacr[r][5]**2 + sacl[r][6]**2)
+                    new_ampr = np.sqrt(sacr[r][5]**2 + sacr[r][6]**2)
                     if new_ampr > ampr:
-                        ampl = new_ampl
+                        ampr = new_ampr
                         r_ix = ir
                 NB += 1
                 combined = list(sacl[left[l_ix]])
