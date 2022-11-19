@@ -42,7 +42,7 @@ def test_identify_saccade_candidates():
 
 def test_microsac():
     input_array = np.load("tests/xr.npy")
-    sac = microsac_detection.microsacc(input_array)
+    sac, radius = microsac_detection.microsacc(input_array)
     expected = np.genfromtxt("tests/xrs_sac.dat")
     res = np.array(sac)
     # offbyone
