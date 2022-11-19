@@ -183,7 +183,7 @@ def microsacc(x, vfac=5, mindur=3, sampling=500):
             sac_prop = [start, end, vpeak, dx, dy, x_amp, y_amp]
             sac_list.append(sac_prop)
             # in theory also the radius
-    return(sac_list)
+    return(sac_list, radius)
 
 
 def _mark_combined_sacs(ixes_r, ixes_l):
