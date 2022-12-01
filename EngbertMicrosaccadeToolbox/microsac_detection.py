@@ -262,29 +262,3 @@ def binsacc(sacl, sacr):
                     NL += 1
                     monol.append(list(sacl[left[0]]))
     return bino, monol, monor
-
-
-
-def aaft():
-    raise Exception("Not Implemented")
-
-def boxcount():
-    raise Exception("Not Implemented")
-
-def ffth():
-    raise Exception("Not Implemented")
-
-def ftpr():
-    raise Exception("Not Implemented")
-
-def ifftsh():
-    raise Exception("Not Implemented")
-
-def lagdist():
-    raise Exception("Not Implemented")
-
-def sacpar():
-    raise Exception("Not Implemented")
-
-def surrogate():
-    raise Exception("Not Implemented")
