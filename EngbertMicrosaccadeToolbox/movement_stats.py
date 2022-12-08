@@ -33,7 +33,3 @@ def lagdist(x):
     lag = np.arange(maxlag)+1
     rv = np.array([lag,r]).transpose()
     return rv
-
-
-def sacpar():
-    raise Exception("Not Implemented")
