@@ -1,14 +1,32 @@
 import numpy as np
 from EngbertMicrosaccadeToolbox import microsac_detection
 
-def aaft():
-    raise Exception("Not Implemented")
+
+def aaft(x, random_sequence=None, y1=None):
     N = len(x)
-    if np.floor(N/2) == N/2:
-        x = x[0:N]
+    print(N)
+    if np.floor(N / 2) == N / 2:
+        x = x[0:N - 1]
         N = N - 1
-    h = np.sort(x)
-    sort_index = np.argsort(x)
+    x_sorted = np.sort(x)
+    x_sorted_index = np.argsort(x)
+
+    if random_sequence is None:
+        random_sequence = np.random.normal(size=int(N))
+    g_sorted = np.sort(random_sequence)
+    # g_sorted_index = np.argsort(g)
+
+    y = random_sequence
+    y[x_sorted_index] = g_sorted
+
+    if y1 is None:
+        y1 = ftpr(y)
+    # y1_sorted = np.sort(y1)
+    y1_sorted_index = np.argsort(y1)
+
+    xs = x
+    xs[y1_sorted_index] = x_sorted
+    return xs
 
 
 def fftsh(x):

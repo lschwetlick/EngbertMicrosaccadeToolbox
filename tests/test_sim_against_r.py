@@ -40,6 +40,15 @@ def test_ftpr():
     expected = load_complex("tests/ftpr_output.dat")
     expected = np.array(expected)
     result = data_simulation.ftpr(input_array, rand)
-    print(expected[0:4])
-    print(result[0:4])
     assert np.allclose(expected.real, result.real)
+
+
+def test_aaft():
+    input_array = np.genfromtxt("tests/aaft_input.dat")
+    rand = np.genfromtxt("tests/aaft_rand_gauss.dat")
+    y1 = load_complex("tests/aaft_ftpr.dat")
+    expected = np.genfromtxt("tests/aaft_out.dat")
+    result = data_simulation.aaft(input_array, rand, y1)
+    assert np.allclose(expected, result)
+
+
