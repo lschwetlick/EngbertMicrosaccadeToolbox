@@ -262,3 +262,63 @@ def binsacc(sacl, sacr):
                     NL += 1
                     monol.append(list(sacl[left[0]]))
     return bino, monol, monor
+
+
+def sacpar(sac):
+    """calculates characteristic parameters for binocular microsaccades
+
+    Parameters
+    ----------
+    sac : list or np.array
+        binocular saccade tables from binsacc
+    
+
+    Returns
+    -------
+    list or np.array depending on input
+        Basic saccade parameters: (1) onset, (2) end, (3) duration, 
+                                (4) delay between eyes, (5) peak velocity, (6) distance, 
+                                (7) orientation related to distance vector, (8) amplitude, 
+                                (9) orientation related to amplitude vector
+    """
+    conv = False
+    if isinstance(sac,list):
+        sac = np.array(sac)
+        conv = True
+    if not sac.size:
+        return None
+    M = len(sac)
+
+    # Onset
+    a = sac[:,[0,7]]
+    a = np.array([min(a[i,:]) for i in range(M)])
+    
+    # Offset
+    b = sac[:,[1,8]]
+    b = np.array([min(b[i,:]) for i in range(M)])
+    
+    # Duration
+    DR = sac[:,1] - sac[:,0] + 1
+    DL = sac[:,8] - sac[:,7] + 1
+    D = (DR+DL)/2
+
+    # Delay between eyes
+    delay = b-a+1
+
+    # Peak velocity
+    vpeak = (sac[:,2] + sac[:,9])/2
+
+    # Saccade distance
+    dist = (np.sqrt(sac[:,3]**2+sac[:,4]**2) + np.sqrt(sac[:,10]**2+sac[:,11]**2))/2
+    angle = np.arctan2((sac[:,4]+sac[:,11])/2, (sac[:,3]+sac[:,10])/2)
+
+    # Saccde amplitude and angle
+    ampl = (np.sqrt(sac[:,5]**2+sac[:,6]**2) + np.sqrt(sac[:,12]**2+sac[:,13]**2))/2
+    angle2 = np.arctan2((sac[:,6] + sac[:,13])/2, (sac[:,5]+sac[:,12])/2)
+
+    out = np.stack([a,b,D,delay,vpeak,dist,angle,ampl,angle2]).T
+
+    # if input was list convert back to list
+    if conv:
+        out = out.tolist()
+    return out

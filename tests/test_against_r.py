@@ -74,3 +74,9 @@ def test_binsacc():
     np.testing.assert_allclose(expected_bino, np.array(bino))
     np.testing.assert_allclose(expected_monol, np.array(monol))
     assert monor == []
+
+def test_sacpar():
+    input_array = np.genfromtxt("tests/sacpar_in.dat")
+    sac = microsac_detection.sacpar(input_array)
+    expected = np.genfromtxt("tests/sacpar_out.dat")
+    np.testing.assert_allclose(expected, sac)
