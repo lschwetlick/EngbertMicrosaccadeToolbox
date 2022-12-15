@@ -4,7 +4,6 @@ from EngbertMicrosaccadeToolbox import microsac_detection
 
 def aaft(x, random_sequence=None, y1=None):
     N = len(x)
-    print(N)
     if np.floor(N / 2) == N / 2:
         x = x[0:N - 1]
         N = N - 1
@@ -73,7 +72,14 @@ def ifftsh(x):
     return xt
 
 
-def surrogate(x, SAMPLING):
-    x0 = x[0,:]
-    v = microsac_detection.vecvel(x,SAMPLING=SAMPLING)
-    vsx = aaft(v[:,0])/SAMPLING
+def surrogate(x, sampling):
+    x0 = x[0, :]
+    v = microsac_detection.vecvel(x, sampling=sampling)
+    vsx = aaft(v[:, 0]) / sampling
+    vsy = aaft(v[:, 1]) / sampling
+    vsx[0] = vsx[0] + x0[0]
+    vsy[0] = vsy[1] + x0[1]
+    xs = np.cumsum(vsx)
+    ys = np.cumsum(vsy)
+    xsur = np.stack((xs, ys), axis=1)
+    return(xsur)
