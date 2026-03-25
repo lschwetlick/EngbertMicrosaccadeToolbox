@@ -206,61 +206,101 @@ def _mark_combined_sacs(ixes_r, ixes_l):
 
 
 def binsacc(sacl, sacr):
-    ixes_l = np.array([np.array([s[0], s[1]]) for s in sacl])
-    ixes_r = np.array([np.array([s[0], s[1]]) for s in sacr])
+    """find binocular microsaccades
+
+    Parameters
+    ----------
+    sacl : list 
+        events for left eye
+    sacr : list
+        events for right eye
+    
+
+    Returns
+    -------
+    list
+        binocular events with [ (1) onset, (2) end, (3) peak velocity,
+                                (4) horizontal component, (5) vertical component,
+                                (6) horizontal amplitude, (6) vertical amplitude,
+
+                                (1) onset, (2) end, (3) peak velocity,
+                                (4) horizontal component, (5) vertical component,
+                                (6) horizontal amplitude, (6) vertical amplitude]]
+    list
+        left eye monocular events with [(1) onset, (2) end, (3) peak velocity,
+                                        (4) horizontal component, (5) vertical component,
+                                        (6) horizontal amplitude, (6) vertical amplitude]
+    list
+        right eye monocular events with [(1) onset, (2) end, (3) peak velocity,
+                                         (4) horizontal component, (5) vertical component,
+                                         (6) horizontal amplitude, (6) vertical amplitude]
+    """
 
     NB = 0
     NR = 0
     NL = 0
-    if (len(sacr) != 0) and (len(sacl) != 0):
-        s = _mark_combined_sacs(ixes_l, ixes_r)
-        # Find onsets and offsets of microsaccades
-        onoff = np.where(np.diff(s) != 0)[0]
-        m = onoff.reshape((-1, 2))
-        N = m.shape[0]
 
-        # Determine binocular saccades
-        bino = []
-        monol = []
-        monor = []
-        for i in range(N):
-            left = np.where(np.logical_and((m[i, 0] <= ixes_l[:, 0]),
-                                           (ixes_l[:, 1] <= m[i, 1])))[0]
-            right = np.where(np.logical_and((m[i, 0] <= ixes_r[:, 0]),
-                                            (ixes_r[:, 1] <= m[i, 1])))[0]
-            # Binocular saccades
-            if len(left) > 0 and len(right) > 0:
-                ampl = 0
-                l_ix = 0
-                for il, l in enumerate(left):
-                    new_ampl = np.sqrt(sacl[l][5]**2 + sacl[l][6]**2)
-                    if new_ampl > ampl:
-                        ampl = new_ampl
-                        l_ix = il
+    bino = []
+    monol = []
+    monor = []
 
-                ampr = 0
-                r_ix = 0
-                for ir, r in enumerate(right):
-                    new_ampr = np.sqrt(sacr[r][5]**2 + sacr[r][6]**2)
-                    if new_ampr > ampr:
-                        ampr = new_ampr
-                        r_ix = ir
-                NB += 1
-                combined = list(sacl[left[l_ix]])
-                combined.extend(list(sacr[right[r_ix]]))
-                bino.append(combined)
-            else:
-                if len(left) == 0:
-                    assert len(right) == 1
-                    ampr = np.sqrt(sacr[right[0]][5]**2 + sacr[right[0]][6]**2)
-                    NR += 1
-            #           ir <- which.max(ampr)
-                    monor.append(list(sacr[right[0]]))
-                if len(right) == 0:
-                    assert len(left) == 1
-                    ampl = np.sqrt(sacl[left[0]][5]**2 + sacl[left[0]][6]**2)
-                    NL += 1
-                    monol.append(list(sacl[left[0]]))
+    # Return early for exclusively monocluar saccades
+    if not sacl:
+        monor = sacr
+        return bino, monol, monor
+
+    if not sacr:
+        monol = sacl
+        return bino, monol, monor
+
+    # Mark combined saccades
+    ixes_l = np.array([np.array([s[0], s[1]]) for s in sacl])
+    ixes_r = np.array([np.array([s[0], s[1]]) for s in sacr])
+    s = _mark_combined_sacs(ixes_l, ixes_r)
+    # Find onsets and offsets of microsaccades
+    onoff = np.where(np.diff(s) != 0)[0]
+    m = onoff.reshape((-1, 2))
+    N = m.shape[0]
+
+    # Determine binocular saccades
+    for i in range(N):
+        left = np.where(np.logical_and((m[i, 0] <= ixes_l[:, 0]),
+                                        (ixes_l[:, 1] <= m[i, 1])))[0]
+        right = np.where(np.logical_and((m[i, 0] <= ixes_r[:, 0]),
+                                        (ixes_r[:, 1] <= m[i, 1])))[0]
+        # Binocular saccades
+        if len(left) > 0 and len(right) > 0:
+            ampl = 0
+            l_ix = 0
+            for il, l in enumerate(left):
+                new_ampl = np.sqrt(sacl[l][5]**2 + sacl[l][6]**2)
+                if new_ampl > ampl:
+                    ampl = new_ampl
+                    l_ix = il
+
+            ampr = 0
+            r_ix = 0
+            for ir, r in enumerate(right):
+                new_ampr = np.sqrt(sacr[r][5]**2 + sacr[r][6]**2)
+                if new_ampr > ampr:
+                    ampr = new_ampr
+                    r_ix = ir
+            NB += 1
+            combined = list(sacl[left[l_ix]])
+            combined.extend(list(sacr[right[r_ix]]))
+            bino.append(combined)
+        else:
+            if len(left) == 0:
+                assert len(right) == 1
+                ampr = np.sqrt(sacr[right[0]][5]**2 + sacr[right[0]][6]**2)
+                NR += 1
+        #           ir <- which.max(ampr)
+                monor.append(list(sacr[right[0]]))
+            if len(right) == 0:
+                assert len(left) == 1
+                ampl = np.sqrt(sacl[left[0]][5]**2 + sacl[left[0]][6]**2)
+                NL += 1
+                monol.append(list(sacl[left[0]]))
     return bino, monol, monor
 
 

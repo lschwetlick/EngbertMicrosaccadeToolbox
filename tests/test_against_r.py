@@ -65,7 +65,9 @@ def test_binsacc():
     input_array_r = np.genfromtxt("tests/sacr.dat")
     input_array_l[:, 0:2] = input_array_l[:, 0:2] - 1
     input_array_r[:, 0:2] = input_array_r[:, 0:2] - 1
-    bino, monol, monor = microsac_detection.binsacc(input_array_l, input_array_r)
+    input_list_l = input_array_l.tolist()
+    input_list_r = input_array_r.tolist()
+    bino, monol, monor = microsac_detection.binsacc(input_list_l, input_list_r)
     expected_bino = np.genfromtxt("tests/bino.dat")
     expected_bino[:, 0:2] = expected_bino[:, 0:2] - 1
     expected_bino[:, 7:9] = expected_bino[:, 7:9] - 1
@@ -74,6 +76,19 @@ def test_binsacc():
     np.testing.assert_allclose(expected_bino, np.array(bino))
     np.testing.assert_allclose(expected_monol, np.array(monol))
     assert monor == []
+
+    # edge case input_array_l = []
+    bino, monol, monor = microsac_detection.binsacc([], input_list_r)
+    assert bino == []
+    assert monol == []
+    np.testing.assert_allclose(input_list_r, np.array(monor))
+
+    # edge case input_array_r = []
+    bino, monol, monor = microsac_detection.binsacc(input_list_l, [])
+    assert bino == []
+    np.testing.assert_allclose(input_list_l, np.array(monol))
+    assert monor == []
+    
 
 def test_sacpar():
     input_array = np.genfromtxt("tests/sacpar_in.dat")
